@@ -23,7 +23,7 @@ def predict(model: Kitsune,
     model.eval()
     for batch in ds:
         batch = batch.to(device)
-        predictions.extend(model(batch).cpu().tolist())
+        predictions.extend(model.score(batch).cpu().tolist())
 
     return torch.as_tensor(predictions)
 

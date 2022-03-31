@@ -44,6 +44,8 @@ Options:
 The supported `INPUT_PATH` data format is a directory containing either CSVs or 
 parquet files (choose the format in the `--file-format` option).
 
+> ⚠ Datasets must be normalized between 0 - 1.
+
 ### Customize your training
 
 In case you have to build a custom data pipeline and train the model manually
