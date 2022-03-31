@@ -13,7 +13,7 @@ from kitsune.engine import build_feature_mapper, predict, train_single_epoch
 from kitsune.models import Kitsune
 
 T = TypeVar("T")
-
+device = torch.device("cuda" if torch.cuda.is_available() "cpu")
 
 @functional_datapipe("skip")
 class SkipIterDataPipe(IterDataPipe[T]):
@@ -105,10 +105,15 @@ def train(input_path: Path,
 
     model = Kitsune(feature_mapper=feature_mapper,
                     compression_rate=compression_rate)
+    model.to(device)
 
     optimizer = torch.optim.SGD(model.parameters(), lr=1e-3, momentum=0.9)
 
-    train_single_epoch(kitsune=model, ds=train_dp, optimizer=optimizer)
+    train_single_epoch(kitsune=model, 
+                       ds=train_dp, 
+                       optimizer=optimizer,
+                       device=device)
+
     model.save(checkpoint_dir / "kitsune.pt")
 
     print("🦊 Computing train anomaly scores...")
