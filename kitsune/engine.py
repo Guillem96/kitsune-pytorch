@@ -16,10 +16,13 @@ def build_feature_mapper(ds: Iterable[torch.Tensor],
 
 
 @torch.inference_mode()
-def predict(model: Kitsune, ds: Iterable[torch.Tensor]) -> torch.Tensor:
+def predict(model: Kitsune, 
+            ds: Iterable[torch.Tensor], 
+            device: torch.device = torch.device("cpu")) -> torch.Tensor:
     predictions = []
     model.eval()
     for batch in ds:
+        batch = batch.to(device)
         predictions.extend(model(batch).cpu().tolist())
 
     return torch.as_tensor(predictions)
@@ -57,6 +60,8 @@ def train_single_epoch(
     running_head = 0.0
 
     for i, sample in enumerate(ds, start=1):
+        sample = sample.to(device)
+
         optimizer.zero_grad()
         losses = model(sample.float())
         tail_loss = losses["tails_losses"].sum(-1).mean(0)
