@@ -1,4 +1,4 @@
-typer~=0.3.2
+typer
 torch~=1.11.0
 torchdata~=0.3.0
 pandas~=1.4.2
