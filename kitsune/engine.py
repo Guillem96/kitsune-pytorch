@@ -1,10 +1,10 @@
-from typing import Iterable, Tuple
 import logging
 from time import time
+from typing import Iterable, Tuple
 
-from tqdm import tqdm
 import torch
 import torch.nn as nn
+from tqdm import tqdm
 
 from kitsune.models import FeatureMapper, Kitsune
 

@@ -1,15 +1,15 @@
+import os
 import pickle
 from doctest import UnexpectedException
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
-import os
 
 import torch
-import torch.nn as nn
 from scipy.cluster.hierarchy import ClusterNode, linkage, to_tree
+from torch import nn
 
 
-class FeatureMapper(object):
+class FeatureMapper:
     """Computes a hierarchical cluster on the given dataset columns.
 
     Parameters
@@ -274,7 +274,7 @@ class TinyAutoEncoder(nn.Module):
         return (hidden @ self.w.t() + self.reconstruct_bias).sigmoid()
 
 
-class RMSELoss(torch.nn.Module):
+class RMSELoss(nn.Module):
     """Convinen Root Mean Squared Error implementation.
 
     Just applies the `sqrt` method to the vanilla PyTorch MSELoss.
@@ -362,9 +362,9 @@ class Kitsune(nn.Module):
     @classmethod
     def from_pretrained(
         cls, fpath: Union[str, Path], map_location: Optional[torch.device] = None
-    ) -> None:
+    ):
         chkp = torch.load(fpath, map_location=map_location)
-        model = cls(**chkp.pop("config"))
+        model: Kitsune = cls(**chkp.pop("config"))
         model.eval()
         model.load_state_dict(chkp.pop("weights"))
         return model

@@ -3,10 +3,10 @@ from pathlib import Path
 
 import numpy as np
 
-from kitsune.data import build_input_data_pipe, FileFormat
+from kitsune.anomaly_score import compute_anomaly_scores
+from kitsune.data import FileFormat, build_input_data_pipe
 from kitsune.scalers import BatchTorchMinMaxScaler
 from kitsune.train import train
-from kitsune.anomaly_score import compute_anomaly_scores
 
 
 def test_input_data_pipe():

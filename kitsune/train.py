@@ -1,15 +1,15 @@
+import json
+import logging
 import random
 from pathlib import Path
-import logging
 from typing import Optional
-import json
 
 import numpy as np
 import torch
 
 from kitsune.data import FileFormat, build_input_data_pipe
-from kitsune.engine import get_dimensions, build_feature_mapper, train_single_epoch
-from kitsune.models import Kitsune, FeatureMapper
+from kitsune.engine import build_feature_mapper, get_dimensions, train_single_epoch
+from kitsune.models import FeatureMapper, Kitsune
 from kitsune.scalers import BatchTorchMinMaxScaler
 
 logging.basicConfig(level=logging.INFO)
@@ -83,7 +83,7 @@ def train(
             max_features_per_cluster=max_features_per_cluster,
         )
 
-        logging.info(f"Feature mapping: {feature_mapper.clusters_}")
+        logging.info(f"🦊 Feature mapping: {feature_mapper.clusters_}")
     else:
         feature_mapper = FeatureMapper.load(pretrained_mapper)
 

@@ -1,11 +1,11 @@
-import pickle
-from typing import Iterable, Tuple, Union
-from pathlib import Path
 import os
+import pickle
+from pathlib import Path
+from typing import Iterable, Tuple, Union
 
-from tqdm import tqdm
-from torchdata.datapipes.iter import IterDataPipe
 import torch
+from torchdata.datapipes.iter import IterDataPipe
+from tqdm import tqdm
 
 
 class BatchTorchMinMaxScaler:
@@ -16,6 +16,10 @@ class BatchTorchMinMaxScaler:
         self.feature_range = feature_range
         self.dim: int
         self.batch_size: int
+        self.x_min: torch.tensor
+        self.x_max: torch.tensor
+        self.xmin_batch: torch.tensor
+        self.xmaxmxmin_batch: torch.tensor
 
     def __init__with_data__(self, x_batch: torch.Tensor):
 
@@ -70,6 +74,6 @@ class BatchTorchMinMaxScaler:
     def load(cls, path: Path, file: str = "scaler.pkl"):
 
         with open(path / file, "rb") as f:
-            scaler = pickle.load(f)
+            scaler: BatchTorchMinMaxScaler = pickle.load(f)
 
         return scaler
