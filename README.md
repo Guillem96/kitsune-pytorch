@@ -2,7 +2,7 @@
 
 This repository contains a Kitsune algorithm implementation with PyTorch.
 
-This implementation is faster (order of x10 faster in time) and much more efficient 
+This implementation is faster (order of x10 faster in time) and much more efficient
 than the [official implementation](https://github.com/ymirsky/KitNET-py) done in plain numpy.
 
 This deep learning model is described in depth in the [Kitsune: An Ensemble of Autoencoders for Online Network Intrusion Detection
@@ -14,11 +14,11 @@ This deep learning model is described in depth in the [Kitsune: An Ensemble of A
 
 Authors citation:
 
-> KitNET is an online, unsupervised, and efficient anomaly detector. A Kitsune, 
-in Japanese folklore, is a mythical fox-like creature that has a number of tails, 
-can mimic different forms, and whose strength increases with experience. Similarly, 
-Kit-NET has an ensemble of small neural networks (autoencoders), which are trained 
-to mimic (reconstruct) network traffic patterns, and whose performance incrementally 
+> KitNET is an online, unsupervised, and efficient anomaly detector. A Kitsune,
+in Japanese folklore, is a mythical fox-like creature that has a number of tails,
+can mimic different forms, and whose strength increases with experience. Similarly,
+Kit-NET has an ensemble of small neural networks (autoencoders), which are trained
+to mimic (reconstruct) network traffic patterns, and whose performance incrementally
 improves overtime.
 
 ## How to train a model
@@ -41,7 +41,7 @@ Options:
   --help                        Show this message and exit.
 ```
 
-The supported `INPUT_PATH` data format is a directory containing either CSVs or 
+The supported `INPUT_PATH` data format is a directory containing either CSVs or
 parquet files (choose the format in the `--file-format` option).
 
 > ⚠ Datasets must be normalized between 0 - 1.
@@ -79,7 +79,7 @@ utilities.
 ## Using a pretrained model
 
 To instantiate the model with the `from_pretrained` class method you previously
-have to serialize the model with the `save` instance method (as we do in the 
+have to serialize the model with the `save` instance method (as we do in the
 above example).
 
 ```python
@@ -97,22 +97,20 @@ with torch.inference_mode():
 
 ## The boring stuff
 
+Install requirements-dev.txt for install tools first.
 
-Use pip-compile to cast the requirements.in to a requirements.txt. 
+Use pip-compile to cast the requirements.in to a requirements.txt.
 
-This requirements.in is known to work on a python=3.10, and is for dev purposes (it points towards torch cpu). To update requirements.txt, compile it as:
+This requirements.in is known to work on a python=3.10 (can take a while to build the scikit wheel), and is for dev purposes (it points towards torch cpu). To update requirements.txt, compile it as:
 
 ```
 pip install pip pip-tools --upgrade
 pip-compile requirements.in --extra-index-url https://download.pytorch.org/whl/cpu  --upgrade
 ```
 
-To install locally
+To install locally (dev & tests)
 
 ```
 pip install -r requirements.txt
 pip install -e .
 ```
-
-
-Use pip install -e . to install locally.
