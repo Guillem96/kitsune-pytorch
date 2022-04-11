@@ -20,18 +20,6 @@ def timeit(method):
     return timed
 
 
-def get_dimensions(ds: Iterable[torch.Tensor]):
-
-    n_samples = 0
-    for _, batch in enumerate(ds):
-        n_features = batch.shape[1]
-        n_samples += batch.shape[0]
-
-    logging.info(f"{n_samples} samples, {n_features} features")
-
-    return n_samples, n_features
-
-
 def build_feature_mapper(
     ds: Iterable[torch.Tensor],
     ds_features: int,

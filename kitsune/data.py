@@ -1,7 +1,7 @@
 import enum
 import logging
 from itertools import zip_longest
-from typing import IO, Any, Dict, Iterator, List, Optional, Tuple, Union
+from typing import IO, Any, Dict, Iterable, Iterator, List, Optional, Tuple, Union
 
 import pandas as pd
 import torch
@@ -10,6 +10,18 @@ from torchdata.datapipes.iter import FileLister, FileOpener, IterDataPipe
 
 ParquetRow = Dict[str, Any]
 ParquetParserReturnType = Union[ParquetRow, Tuple[str, Any]]
+
+
+def get_dimensions(ds: Iterable[torch.Tensor]):
+
+    n_samples = 0
+    for _, batch in enumerate(ds):
+        n_features = batch.shape[1]
+        n_samples += batch.shape[0]
+
+    logging.info(f"{n_samples} samples, {n_features} features")
+
+    return n_samples, n_features
 
 
 class FileFormat(enum.Enum):
@@ -25,7 +37,7 @@ class ParquetParserIterDataPipe(IterDataPipe[ParquetParserReturnType]):
         *,
         return_path: bool = False,
         engine: str = "auto",
-        columns: Optional[List[str]] = None
+        columns: Optional[List[str]] = None,
     ) -> None:
         super().__init__()
         self.source_datapipe = source_datapipe
