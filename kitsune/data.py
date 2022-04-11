@@ -1,6 +1,7 @@
 import enum
 from itertools import zip_longest
 from typing import IO, Any, Dict, Iterator, List, Optional, Tuple, Union
+import logging
 
 import pandas as pd
 import torch
@@ -86,5 +87,5 @@ if __name__ == "__main__":
                                batch_size=16,
                                file_format=FileFormat.csv)
     for features in dp:
-        print(features.size())
+        logging.info(features.size())
         break

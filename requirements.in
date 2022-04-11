@@ -1,0 +1,7 @@
+typer~=0.3.2
+torch~=1.11.0
+torchdata~=0.3.0
+pandas~=1.4.2
+scikit-learn~=1.0.2
+scipy~=1.8.0
+tqdm~=4.64.0

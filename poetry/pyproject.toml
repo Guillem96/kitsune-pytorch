@@ -5,7 +5,7 @@ description = "Kitsune anomaly detection model implemented in PyTorch."
 authors = [
     "Guillem Orellana Trullols <guillem.orellana@gmail.com>"
 ]
-license = "GPLv3"
+#license = "GPLv3"
 readme = "README.md"
 python = "^3.8"
 homepage = "https://github.com/Guillem96/kitsune-pytorch"

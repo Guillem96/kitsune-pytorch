@@ -1,6 +1,8 @@
+import pickle
 from doctest import UnexpectedException
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
+import os
 
 import torch
 import torch.nn as nn
@@ -62,7 +64,7 @@ class FeatureMapper(object):
         self._fitted = False
         self._clusters = []
 
-    def parital_fit(self, x: torch.Tensor) -> None:
+    def partial_fit(self, x: torch.Tensor) -> None:
         """Updates the internal statistics based on data batch.
 
         Parameters
@@ -100,7 +102,7 @@ class FeatureMapper(object):
             Processed dataset.
         """
         self._init_stats()
-        self.parital_fit(x)
+        self.partial_fit(x)
 
     def transform(self, x: torch.Tensor) -> List[torch.Tensor]:
         """Splits the given data into subgroups.
@@ -203,6 +205,22 @@ class FeatureMapper(object):
         right_clusters = self._split_clusters(cn.get_right())
         return left_clusters + right_clusters
 
+    def save(self, fpath: Union[str, Path]) -> None:
+        if os.path.exists(Path(fpath).parent) is False:
+            os.mkdir(Path(fpath).parent)        
+
+        with open(fpath, 'wb') as f:
+            pickle.dump(self, f)
+
+        return
+    
+    @classmethod
+    def load(self, fpath: Union[str, Path]) -> None:
+
+        with open(fpath, 'rb') as f:
+            mapper = pickle.load(f)
+
+        return mapper
 
 class TinyAutoEncoder(nn.Module):
     """AutoEncoder with one compresion layer.
@@ -324,6 +342,8 @@ class Kitsune(nn.Module):
             },
             "weights": self.state_dict(),
         }
+        if os.path.exists(Path(fpath).parent) is False:
+            os.mkdir(Path(fpath).parent)
         torch.save(chkp, fpath)
 
     @classmethod

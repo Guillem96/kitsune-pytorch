@@ -94,3 +94,25 @@ with torch.inference_mode():
 
 # scores of shape (16,)
 ```
+
+## The boring stuff
+
+
+Use pip-compile to cast the requirements.in to a requirements.txt. 
+
+This requirements.in is known to work on a python=3.10, and is for dev purposes (it points towards torch cpu). To update requirements.txt, compile it as:
+
+```
+pip install pip pip-tools --upgrade
+pip-compile requirements.in --extra-index-url https://download.pytorch.org/whl/cpu  --upgrade
+```
+
+To install locally
+
+```
+pip install -r requirements.txt
+pip install -e .
+```
+
+
+Use pip install -e . to install locally.
