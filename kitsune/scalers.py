@@ -63,7 +63,7 @@ class BatchTorchMinMaxScaler:
     def save(self, path: Path, file: str = "scaler.pkl") -> None:
 
         if os.path.exists(path) is False:
-            os.mkdir(path)
+            os.makedirs(path)
 
         with open(path / file, "wb") as f:
             pickle.dump(self, f)

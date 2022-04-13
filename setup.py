@@ -13,9 +13,9 @@ setup(
     install_requires=[
         "typer",
         "torch~=1.11",
-        "torchdata~=0.3",
+        "torchdata>=0.3",
         "pandas~=1.2",
-        "scikit-learn~=0.24",
+        "scikit-learn>=0.24",
         "scipy~=1.8",
         "tqdm",
     ],

@@ -82,21 +82,20 @@ def train(
             ds_features=n_features,
             max_features_per_cluster=max_features_per_cluster,
         )
-
-        logging.info(f"🦊 Feature mapping: {feature_mapper.clusters_}")
     else:
         feature_mapper = FeatureMapper.load(pretrained_mapper)
+
+    logging.info(f"🦊 Feature mapping: {feature_mapper.clusters_}")
 
     if prefit_scaler is None:
         logging.info("🦊 Fitting scaler ...")
         scaler = BatchTorchMinMaxScaler()
         scaler.fit(dp)
-        dp = scaler.transform(dp)
     else:
         scaler: BatchTorchMinMaxScaler = BatchTorchMinMaxScaler.load(
             Path(prefit_scaler).parent
         )
-        dp = scaler.transform(dp)
+    dp = scaler.transform(dp)
 
     model = Kitsune(feature_mapper=feature_mapper, compression_rate=compression_rate)
     model.to(device)
