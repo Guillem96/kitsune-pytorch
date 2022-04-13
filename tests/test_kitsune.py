@@ -1,4 +1,3 @@
-from operator import mod
 from pathlib import Path
 
 import numpy as np
@@ -37,12 +36,29 @@ def test_scaler(tmp_path: Path):
     assert (round(np.mean(data), 3) > 0.188) and (round(np.mean(data), 3) < 0.200)
     assert (round(np.std(data), 3) > 0.272) and (round(np.mean(data), 3) < 0.274)
 
+    # # save load and score scaler------------------------------------------
     scaler.save(tmp_path)
-
     dp = build_input_data_pipe(
         "tests/mirai100.csv", batch_size=10, shuffle=True, file_format=FileFormat("csv")
     )
-    scaler: BatchTorchMinMaxScaler = scaler.load(tmp_path)
+    scaler = scaler.load(tmp_path)
+    dp = scaler.transform(dp)
+
+    assert int(scaler.x_max.mean().numpy().round()) == 9642608427008
+    assert int(scaler.x_min.mean().numpy().round()) == 222673936
+    assert int(scaler.x_min.min().numpy().round()) == -40
+
+    data = np.vstack(np.array([batch.numpy() for batch in list(dp)]))
+
+    assert (round(np.mean(data), 3) > 0.188) and (round(np.mean(data), 3) < 0.200)
+    assert (round(np.std(data), 3) > 0.272) and (round(np.mean(data), 3) < 0.274)
+
+    # # fit with a different batch size-------------------------------------------
+
+    dp = build_input_data_pipe(
+        "tests/mirai100.csv", batch_size=2, shuffle=True, file_format=FileFormat("csv")
+    )
+    scaler = scaler.load(tmp_path)
     dp = scaler.transform(dp)
 
     assert int(scaler.x_max.mean().numpy().round()) == 9642608427008

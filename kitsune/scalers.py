@@ -1,27 +1,41 @@
 import os
 import pickle
 from pathlib import Path
-from typing import Iterable, Tuple, Union
+from typing import Iterable, List, Optional, Tuple, Union
 
 import torch
-from torchdata.datapipes.iter import IterDataPipe
+from torchdata.datapipes.iter import Collator, IterDataPipe
 from tqdm import tqdm
+
+DataPipeIterTensors = Union[IterDataPipe[torch.Tensor], Iterable[torch.Tensor]]
 
 
 class BatchTorchMinMaxScaler:
     """MinMax Scaler for a batched DataPipeline of Torch Tensors"""
 
-    def __init__(self, feature_range: Tuple[int, int] = (0, 1)) -> None:
+    def __init__(
+        self,
+        feature_range: Tuple[int, int] = (0, 1),
+        dim: Optional[int] = None,
+        batch_size: Optional[int] = None,
+    ) -> None:
+        """
+
+        Args:
+            feature_range (Tuple[int, int], optional): _description_. Defaults to (0, 1).
+            dim (Optional[int], optional): Read from the first batch data if not provided.
+            batch_size (Optional[int], optional): Read from the first batch data if not provided.
+        """
 
         self.feature_range = feature_range
-        self.dim: int
-        self.batch_size: int
+        self.dim = dim
+        self.batch_size = dim
         self.x_min: torch.tensor
         self.x_max: torch.tensor
         self.xmin_batch: torch.tensor
         self.xmaxmxmin_batch: torch.tensor
 
-    def __init__with_data__(self, x_batch: torch.Tensor):
+    def _init_with_data(self, x_batch: torch.Tensor):
 
         self.batch_size, self.dim = x_batch.shape
         self.x_min = torch.tensor([float("inf") for n in range(self.dim)])
@@ -29,18 +43,8 @@ class BatchTorchMinMaxScaler:
 
         return
 
-    def fit(self, X: Union[Iterable[torch.Tensor], IterDataPipe[torch.Tensor]]):
-
-        for ib, batch in tqdm(enumerate(X)):
-
-            if ib == 0:
-                self.__init__with_data__(batch)
-
-            x_min_batch = torch.min(batch, axis=0).values
-            x_max_batch = torch.max(batch, axis=0).values
-
-            self.x_min = torch.minimum(self.x_min, x_min_batch)
-            self.x_max = torch.maximum(self.x_max, x_max_batch)
+    def _create_batch_tensors(self):
+        """create a tensor of batch size filled with duplicates of xmnin and xmaxmin"""
 
         self.xmin_batch = torch.vstack([self.x_min for bb in range(self.batch_size)])
         self.xmaxmxmin_batch = (
@@ -48,17 +52,53 @@ class BatchTorchMinMaxScaler:
             - self.xmin_batch
         )
 
-    def transform(self, X: IterDataPipe[torch.Tensor]) -> IterDataPipe[torch.Tensor]:
-        def scale_batch(x):
-            xp = (x - self.xmin_batch) / self.xmaxmxmin_batch
-            xp = (
-                xp * (self.feature_range[1] - self.feature_range[0])
-                + self.feature_range[0]
-            )
-            xp = torch.nan_to_num(xp)  # for columns with constant values
-            return xp
+        return
 
-        return X.map(lambda x: scale_batch(x))
+    def _setup_fit(self, batch: torch.Tensor):
+        self._init_with_data(batch)
+        self._create_batch_tensors()
+        return
+
+    def fit(self, X: DataPipeIterTensors):
+
+        for ib, batch in tqdm(enumerate(X)):
+
+            if ib == 0 and (self.dim is None or self.batch_size is None):
+                self._setup_fit(batch)
+            x_min = torch.min(batch, axis=0).values
+            x_max = torch.max(batch, axis=0).values
+
+            self.x_min = torch.minimum(self.x_min, x_min)
+            self.x_max = torch.maximum(self.x_max, x_max)
+
+        return
+
+    def _setup_transform(self, X: DataPipeIterTensors):
+        # Ugly, but I cannot find a next() in CollatorIterDataPipe
+        for ib, batch in enumerate(X):
+            if ib == 0:
+                self.batch_size, self.dim = batch.shape
+                break
+        self._create_batch_tensors()
+        return
+
+    def transform(self, X: DataPipeIterTensors) -> DataPipeIterTensors:
+
+        self._setup_transform(X)
+
+        if isinstance(X, IterDataPipe):
+            return X.map(lambda x: self._scale_batch(x))
+
+        if isinstance(X, list):
+            return list(map(lambda x: self._scale_batch(x), X))
+
+    def _scale_batch(self, batch: torch.Tensor):
+        xp = (batch - self.xmin_batch) / self.xmaxmxmin_batch
+        xp = (
+            xp * (self.feature_range[1] - self.feature_range[0]) + self.feature_range[0]
+        )
+        xp = torch.nan_to_num(xp)  # for columns with constant values
+        return xp
 
     def save(self, path: Path, file: str = "scaler.pkl") -> None:
 
