@@ -63,17 +63,22 @@ def build_input_data_pipe(
     batch_size: int,
     shuffle: bool = True,
     file_format: FileFormat = FileFormat.csv,
+    file_has_header: bool = False,
 ) -> IterDataPipe[torch.Tensor]:
 
     file_filter = lambda fname: fname.endswith(file_format.value)
     dp = FileLister(root=root, recursive=True).filter(file_filter)
     dp = FileOpener(dp, mode="rb")
 
+    skip_lines = 0
+    if file_has_header:
+        skip_lines = 1
+
     if file_format == FileFormat.parquet:
         dp = dp.parse_parquet(return_path=False, columns=["features"])
         dp = dp.map(_to_dense_vector)
     else:
-        dp = dp.parse_csv(return_path=False)
+        dp = dp.parse_csv(return_path=False, skip_lines=skip_lines)
         dp = dp.map(lambda x: torch.as_tensor([float(o) for o in x]))
 
     if shuffle:

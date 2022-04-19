@@ -2,7 +2,7 @@ from setuptools import find_namespace_packages, setup
 
 setup(
     name="kitsunetorch",
-    version="0.2.6",
+    version="0.2.7",
     description="Kitsune anomaly detection model implemented in PyTorch.",
     author="Guillem Orellana Trullols",
     author_email="guillem.orellana@gmail.com",

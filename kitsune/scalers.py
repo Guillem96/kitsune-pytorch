@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Iterable, List, Optional, Tuple, Union
 
 import torch
-from torchdata.datapipes.iter import Collator, IterDataPipe
+from torchdata.datapipes.iter import IterDataPipe
 from tqdm import tqdm
 
 DataPipeIterTensors = Union[IterDataPipe[torch.Tensor], Iterable[torch.Tensor]]
@@ -61,10 +61,10 @@ class BatchTorchMinMaxScaler:
 
     def fit(self, X: DataPipeIterTensors):
 
-        for ib, batch in tqdm(enumerate(X)):
+        if self.dim is None or self.batch_size is None:
+            self._setup_fit(next(iter(X)))
 
-            if ib == 0 and (self.dim is None or self.batch_size is None):
-                self._setup_fit(batch)
+        for _, batch in tqdm(enumerate(X)):
             x_min = torch.min(batch, axis=0).values
             x_max = torch.max(batch, axis=0).values
 
@@ -74,12 +74,10 @@ class BatchTorchMinMaxScaler:
         return
 
     def _setup_transform(self, X: DataPipeIterTensors):
-        # Ugly, but I cannot find a next() in CollatorIterDataPipe
-        for ib, batch in enumerate(X):
-            if ib == 0:
-                self.batch_size, self.dim = batch.shape
-                break
+
+        self.batch_size, self.dim = next(iter(X)).shape
         self._create_batch_tensors()
+
         return
 
     def transform(self, X: DataPipeIterTensors) -> DataPipeIterTensors:
