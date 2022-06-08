@@ -1,7 +1,9 @@
-
+pytest-cov
 pip-tools
 pre-commit
 black
 mypy
 pylint
 isort
+coverage
+pip-audit
